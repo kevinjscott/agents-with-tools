@@ -9,6 +9,7 @@ import os
 import re
 import builtins
 import textwrap
+from flask_socketio import emit
 
 
 client = OpenAI()
@@ -98,6 +99,7 @@ def get_completion(message, agent, funcs, thread):
     """
 
     print("🤖 get_completion sending message: " + message)
+    emit('new_info', {'type': "agent", 'text': "🤖 " + message})
 
     # create new message in the thread
     message = client.beta.threads.messages.create(
@@ -141,22 +143,25 @@ def get_completion(message, agent, funcs, thread):
         tool_calls = run.required_action.submit_tool_outputs.tool_calls
         tool_outputs = []
         for tool_call in tool_calls:
-        #   print('\033[31m🛠️ tool_call requires_action: ' + str(tool_call.function), '\033[0m') # red
-          print('\033[31m🛠️ ' + str(tool_call.function.name), '\033[0m') # red
-          func = next(iter([func for func in funcs if func.__name__ == tool_call.function.name]))
+            print('\033[31m🛠️ ' + str(tool_call.function.name), '\033[0m') # red
+            emit('new_info', {'type': "tool_call", 'text': '🛠️ Calling ' + str(tool_call.function.name)})
+            func = next(iter([func for func in funcs if func.__name__ == tool_call.function.name]))
 
-          try:
+        try:
             func = func(assistant_id=agent.id, **eval(tool_call.function.arguments))
             print('\033[31m🛠️ tool_call: ' + func.chain_of_thought, '\033[0m') # red
+            emit('new_info', {'type': "tool_call", 'text': '🛠️ ' + func.chain_of_thought})
             for key in func.model_fields_set:
-                if key != 'chain_of_thought':
+                if key != "chain_of_thought":
                     print(f'\033[31m🛠️ {key}: {getattr(func, key)}', '\033[0m') # red
+                    emit('new_info', {'type': "tool_call", 'text': f'🛠️ {key}: {getattr(func, key)}'})
             output = func.run()
-          except Exception as e:
+        except Exception as e:
             output = "Error: " + str(e)
 
-          print(f"\033[32m🛠️ {tool_call.function.name} output:\n", output, '\033[0m') # green
-          tool_outputs.append({"tool_call_id": tool_call.id, "output": output})
+        print(f"\033[32m🛠️ {tool_call.function.name} output:\n", output, '\n', '\033[0m') # green
+        emit('new_info', {'type': "tool_result", 'text': "🛠️ " + tool_call.function.name + " output:\n" + output + "\n"})
+        tool_outputs.append({"tool_call_id": tool_call.id, "output": output})
 
         # submit tool outputs
         run = client.beta.threads.runs.submit_tool_outputs(
@@ -173,7 +178,7 @@ def get_completion(message, agent, funcs, thread):
           thread_id=thread.id
         )
         message = messages.data[0].content[0].text.value
-        print("🤖 get_completion received completion: " + message)
+        # emit('new_info', {'type': "agent", 'text': message})
         return message
       
 def load_functions_and_tools(assistant_id):

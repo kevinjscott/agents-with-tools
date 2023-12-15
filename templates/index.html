@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js" integrity="sha512-zoJXRvW2gC8Z0Xo3lBbao5+AS3g6YWr5ztKqaicua11xHo+AvE1b0lT9ODgrHTmNUxeCw0Ry4BGRYZfXu70weg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+</head>
+<body class="bg-gray-800 text-white">
+    <button id="startButton" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Start</button>
+    <div id="info" class="p-5"></div>
+
+    <style>
+        .agent { color: white; }
+        .tool_call { color: red; }
+        .tool_result { color: green; }
+        .collapsed { max-height: 50px; overflow: hidden; cursor: pointer; white-space: pre-wrap; }
+    </style>
+
+    <script>
+        var socket = io();
+        socket.on('new_info', function(data) {
+            var infoDiv = document.getElementById('info');
+            if (data.type === "reset") {
+                infoDiv.innerHTML = '';
+                document.getElementById('startButton').style.display = 'block';
+                return;
+            }
+            var newP = document.createElement('p');
+            newP.textContent = data.text.length > 100 ? data.text.substring(0, 100) + '...' : data.text;
+            newP.className = data.type + " text-lg";
+            if (data.text.length > 100) {
+                newP.classList.add('collapsed');
+                newP.style.textOverflow = 'ellipsis';
+                newP.style.display = '-webkit-box';
+                newP.style.webkitLineClamp = '3';
+                newP.style.webkitBoxOrient = 'vertical';
+                newP.onclick = function() {
+                    if (this.classList.contains('collapsed')) {
+                        this.classList.remove('collapsed');
+                        this.style.textOverflow = 'initial';
+                        this.style.display = 'block';
+                        this.textContent = data.text; // Display the full text when expanded
+                    } else {
+                        this.classList.add('collapsed');
+                        this.style.textOverflow = 'ellipsis';
+                        this.style.display = '-webkit-box';
+                        this.style.webkitLineClamp = '3';
+                        this.style.webkitBoxOrient = 'vertical';
+                        this.textContent = data.text.substring(0, 100) + '...';
+                    }
+                }
+            }
+            infoDiv.appendChild(newP);
+        });
+
+        document.getElementById('startButton').addEventListener('click', function() {
+            this.style.display = 'none'; // Hide the start button once it's been pressed
+            socket.emit('start');
+        });
+    </script>
+</body>
+</html>
