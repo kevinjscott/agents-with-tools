@@ -1,0 +1,11 @@
+{
+  "configurations": [
+    {
+      "name": "Python venv",
+      "type": "python",
+      "request": "launch",
+      "program": "agent_tool_maker.py",
+      "justMyCode": true
+    }
+  ]
+}
