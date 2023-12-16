@@ -144,7 +144,7 @@ def get_completion(message, agent, funcs, thread):
         tool_outputs = []
         for tool_call in tool_calls:
             print('\033[31m🛠️ ' + str(tool_call.function.name), '\033[0m') # red
-            emit('new_info', {'type': "tool_call", 'text': '➡️ ' + str(tool_call.function.name) + "..."})
+            emit('new_info', {'type': "tool_call", 'text': '➡️🛠️ ' + str(tool_call.function.name) + "..."})
             func = next(iter([func for func in funcs if func.__name__ == tool_call.function.name]))
 
         try:
@@ -160,7 +160,7 @@ def get_completion(message, agent, funcs, thread):
             output = "Error: " + str(e)
 
         print(f"\033[32m🛠️ {tool_call.function.name} output:\n", output, '\n', '\033[0m') # green
-        emit('new_info', {'type': "tool_result", 'text': "⬅️ " + tool_call.function.name + "...\n" + output + "\n"})
+        emit('new_info', {'type': "tool_result", 'text': "⬅️🛠️ " + tool_call.function.name + "...\n" + output + "\n"})
         tool_outputs.append({"tool_call_id": tool_call.id, "output": output})
 
         # submit tool outputs

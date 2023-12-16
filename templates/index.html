@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js" integrity="sha512-zoJXRvW2gC8Z0Xo3lBbao5+AS3g6YWr5ztKqaicua11xHo+AvE1b0lT9ODgrHTmNUxeCw0Ry4BGRYZfXu70weg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 </head>
@@ -15,7 +16,7 @@
             color: white; 
             font-size: 1.0rem;
             display: -webkit-box;
-            -webkit-line-clamp: 1;
+            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -67,7 +68,7 @@
       <button id="startButton" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Start</button>
     </div>
     <div id="info" class="p-5"></div>
-
+    <div id="spinner"><div class="lds-grid" id="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div>
     <script>
         var socket = io();
         socket.on('new_info', function(data) {
@@ -75,22 +76,28 @@
             if (data.type === "reset") {
                 infoDiv.innerHTML = '';
                 document.getElementById('buttonHolder').style.display = 'flex';
+                document.getElementById('spinner').style.display = 'none';
                 return;
+              } else if (data.type === "status_running") {
+                document.getElementById('spinner').style.display = 'flex';
+            } else if (data.type === "status_stopped") {
+                document.getElementById('spinner').style.display = 'none';
+            } else {
+                var newP = document.createElement('p');
+                newP.textContent = data.text;
+                newP.className = "info-text " + data.type;
+                infoDiv.appendChild(newP);
+                if (data.text.split('\n').length > 1 || newP.scrollHeight > newP.clientHeight) {
+                    newP.className += " collapsed";
+                    newP.onclick = function() {
+                        if (this.className.includes("collapsed")) {
+                            this.className = this.className.replace("collapsed", "expanded");
+                        } else if (this.className.includes("expanded")) {
+                            this.className = this.className.replace("expanded", "collapsed");
+                        }
+                    };
+                }
             }
-            var newP = document.createElement('p');
-            newP.textContent = data.text;
-            newP.className = "info-text " + data.type;
-            if (data.text.split('\n').length > 1 || newP.scrollWidth > newP.clientWidth) {
-                newP.className += " collapsed";
-                newP.onclick = function() {
-                    if (this.className.includes("collapsed")) {
-                        this.className = this.className.replace("collapsed", "expanded");
-                    } else if (this.className.includes("expanded")) {
-                        this.className = this.className.replace("expanded", "collapsed");
-                    }
-                };
-            }
-            infoDiv.appendChild(newP);
         });
 
         document.getElementById('startButton').addEventListener('click', function() {
