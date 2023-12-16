@@ -144,23 +144,23 @@ def get_completion(message, agent, funcs, thread):
         tool_outputs = []
         for tool_call in tool_calls:
             print('\033[31m🛠️ ' + str(tool_call.function.name), '\033[0m') # red
-            emit('new_info', {'type': "tool_call", 'text': '🛠️ Calling ' + str(tool_call.function.name)})
+            emit('new_info', {'type': "tool_call", 'text': '➡️ ' + str(tool_call.function.name) + "..."})
             func = next(iter([func for func in funcs if func.__name__ == tool_call.function.name]))
 
         try:
             func = func(assistant_id=agent.id, **eval(tool_call.function.arguments))
             print('\033[31m🛠️ tool_call: ' + func.chain_of_thought, '\033[0m') # red
-            emit('new_info', {'type': "tool_call", 'text': '🛠️ ' + func.chain_of_thought})
+            emit('new_info', {'type': "tool_call", 'text': '🧠 chain_of_thought: ' + func.chain_of_thought})
             for key in func.model_fields_set:
                 if key != "chain_of_thought":
                     print(f'\033[31m🛠️ {key}: {getattr(func, key)}', '\033[0m') # red
-                    emit('new_info', {'type': "tool_call", 'text': f'🛠️ {key}: {getattr(func, key)}'})
+                    emit('new_info', {'type': "tool_call", 'text': f'{key}:\n{getattr(func, key)}' if '\n' in getattr(func, key) else f'{key}: {getattr(func, key)}'})
             output = func.run()
         except Exception as e:
             output = "Error: " + str(e)
 
         print(f"\033[32m🛠️ {tool_call.function.name} output:\n", output, '\n', '\033[0m') # green
-        emit('new_info', {'type': "tool_result", 'text': "🛠️ " + tool_call.function.name + " output:\n" + output + "\n"})
+        emit('new_info', {'type': "tool_result", 'text': "⬅️ " + tool_call.function.name + "...\n" + output + "\n"})
         tool_outputs.append({"tool_call_id": tool_call.id, "output": output})
 
         # submit tool outputs

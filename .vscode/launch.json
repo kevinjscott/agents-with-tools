@@ -6,6 +6,19 @@
       "request": "launch",
       "program": "main.py",
       "justMyCode": true
+    },
+    {
+      "name": "Launch Chrome",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Python Server and Chrome",
+      "configurations": ["Python venv", "Launch Chrome"]
     }
   ]
 }

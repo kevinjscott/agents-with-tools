@@ -5,16 +5,68 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js" integrity="sha512-zoJXRvW2gC8Z0Xo3lBbao5+AS3g6YWr5ztKqaicua11xHo+AvE1b0lT9ODgrHTmNUxeCw0Ry4BGRYZfXu70weg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 </head>
-<body class="bg-gray-800 text-white">
-    <button id="startButton" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Start</button>
-    <div id="info" class="p-5"></div>
-
+<body>
     <style>
-        .agent { color: white; }
-        .tool_call { color: red; }
-        .tool_result { color: green; }
-        .collapsed { max-height: 50px; overflow: hidden; cursor: pointer; white-space: pre-wrap; }
+        body {
+            background-color: black;
+            color: white;
+        }
+        .info-text { 
+            color: white; 
+            font-size: 1.0rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .info-text.agent { color: white; }
+        .info-text.tool_call { 
+            color: rgb(177, 177, 177);
+            background-color: #118;
+            padding-left: 50px;
+        }
+        .info-text.tool_call.collapsed::after {
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, #118 100%);
+        }
+        .info-text.tool_result { 
+            color: black;
+            background-color: #aaf; 
+            padding-left: 50px
+        }
+        .info-text.tool_result.collapsed::after {
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, #aaf 100%);
+        }
+        .info-text.collapsed { 
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;  
+            text-wrap: wrap; 
+            cursor: pointer; 
+            position: relative;
+        }
+        .info-text.collapsed::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgb(0, 0, 0) 100%);
+            z-index: 1;
+        }
+        .info-text.expanded {
+            text-overflow: initial;
+            display: block;
+            cursor: pointer; 
+            white-space: pre-wrap;
+        }
     </style>
+
+    <div id="buttonHolder" style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+      <button id="startButton" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Start</button>
+    </div>
+    <div id="info" class="p-5"></div>
 
     <script>
         var socket = io();
@@ -22,39 +74,27 @@
             var infoDiv = document.getElementById('info');
             if (data.type === "reset") {
                 infoDiv.innerHTML = '';
-                document.getElementById('startButton').style.display = 'block';
+                document.getElementById('buttonHolder').style.display = 'flex';
                 return;
             }
             var newP = document.createElement('p');
-            newP.textContent = data.text.length > 100 ? data.text.substring(0, 100) + '...' : data.text;
-            newP.className = data.type + " text-lg";
-            if (data.text.length > 100) {
-                newP.classList.add('collapsed');
-                newP.style.textOverflow = 'ellipsis';
-                newP.style.display = '-webkit-box';
-                newP.style.webkitLineClamp = '3';
-                newP.style.webkitBoxOrient = 'vertical';
+            newP.textContent = data.text;
+            newP.className = "info-text " + data.type;
+            if (data.text.split('\n').length > 1 || newP.scrollWidth > newP.clientWidth) {
+                newP.className += " collapsed";
                 newP.onclick = function() {
-                    if (this.classList.contains('collapsed')) {
-                        this.classList.remove('collapsed');
-                        this.style.textOverflow = 'initial';
-                        this.style.display = 'block';
-                        this.textContent = data.text; // Display the full text when expanded
-                    } else {
-                        this.classList.add('collapsed');
-                        this.style.textOverflow = 'ellipsis';
-                        this.style.display = '-webkit-box';
-                        this.style.webkitLineClamp = '3';
-                        this.style.webkitBoxOrient = 'vertical';
-                        this.textContent = data.text.substring(0, 100) + '...';
+                    if (this.className.includes("collapsed")) {
+                        this.className = this.className.replace("collapsed", "expanded");
+                    } else if (this.className.includes("expanded")) {
+                        this.className = this.className.replace("expanded", "collapsed");
                     }
-                }
+                };
             }
             infoDiv.appendChild(newP);
         });
 
         document.getElementById('startButton').addEventListener('click', function() {
-            this.style.display = 'none'; // Hide the start button once it's been pressed
+            this.parentElement.style.display = 'none';
             socket.emit('start');
         });
     </script>
