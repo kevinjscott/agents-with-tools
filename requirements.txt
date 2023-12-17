@@ -1,0 +1,5 @@
+
+beautifulsoup4
+google-search-results
+openai
+requests

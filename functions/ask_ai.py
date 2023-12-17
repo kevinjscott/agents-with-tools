@@ -1,5 +1,5 @@
-from instructor import OpenAISchema # [note for this template only] this is always required
-from typing import ClassVar
+from instructor import OpenAISchema
+from typing import ClassVar, List
 from openai import OpenAI
 from pydantic import Field
 
@@ -11,7 +11,7 @@ class AskAI(OpenAISchema):
     
     However, it's important to note that the tool is limited to text-based operations and does not support multi-modal tasks. It also does not provide options for different models or parameters, and cannot produce non-text responses such as images or audio. Therefore, it's best used when the task at hand is purely text-based and within the capabilities of the gpt-4-1106-preview model.
 
-    IMPORTANT: This tool can not access the internet. It can only access the OpenAI API. If you need this tool to operate on data from the internet, you must first use a tool that extracts the data from the internet and then use that data as the input to this tool.
+    IMPORTANT: This tool can not access the internet. It can only access the OpenAI API. If you need this tool to operate on data from the internet or information that is current, you must first use a tool that extracts the data from the internet and then use that data as the input to this tool.
     
     Pros:
     - It's a simple and efficient way to interact with the OpenAI API.
@@ -36,7 +36,7 @@ class AskAI(OpenAISchema):
     
     The model used in this tool is gpt-4-1106-preview.
     """
-    required_modules: ClassVar = [
+    required_modules: ClassVar[List[str]] = [
         'openai'
     ]
 

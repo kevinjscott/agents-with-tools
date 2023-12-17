@@ -1,4 +1,4 @@
-from typing import ClassVar
+from typing import ClassVar, List
 from instructor import OpenAISchema
 from pydantic import Field
 import subprocess
@@ -19,8 +19,7 @@ class ExecuteShellCommand(OpenAISchema):
     
     If you need to execute commands in a more controlled or secure environment, consider using a different tool.
     """
-    required_modules: ClassVar = [
-    ]
+    required_modules: ClassVar[List[str]] = []
 
     chain_of_thought: str = Field(..., description="Think step by step to determine the correct actions that are needed to be taken in order to complete the task.")
 

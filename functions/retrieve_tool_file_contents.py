@@ -1,4 +1,4 @@
-from typing import ClassVar
+from typing import ClassVar, List
 from instructor import OpenAISchema
 from pydantic import Field
 
@@ -20,6 +20,8 @@ class RetrieveToolFileContents(OpenAISchema):
     
     If the file structure is unknown or the naming conventions differ, adjustments to the code may be necessary.
     """
+
+    required_modules: ClassVar[List[str]] = []
 
     chain_of_thought: str = Field(
         ..., description="Think step by step to determine the correct actions that are needed to be taken in order to complete the task."

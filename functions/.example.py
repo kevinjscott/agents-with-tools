@@ -15,10 +15,9 @@ class MyNewTool(OpenAISchema): # IMPORTANT: the new class must be derived from O
     
     [Instructions for when to use an alternative tool]
     """
-
-    required_modules: ClassVar = [] # array of pip-installable package names that are needed to support the imports of this file
+    required_modules: ClassVar[List[str]] = ['nest_asyncio', 'requests_html', 'markdownify'] # array of pip-installable package names that are needed to support the imports of this file (these are just examples). Put everything on a single line.
     # IMPORTANT: required_modules is always required and must always be a ClassVar. If there are no required modules, then use:
-    # required_modules: ClassVar = []
+    # required_modules: ClassVar[List[str]] = []
 
     chain_of_thought: str = Field(..., description="Think step by step to determine the correct actions that are needed to be taken in order to complete the task.")
     # IMPORTANT: chain_of_thought param must be included in the new tool as an exact copy of the chain_of_thought param above. This is required for the AI to understand the context of the tool's usage. Do not change this line when creating the new tool...just copy it over.
@@ -31,7 +30,10 @@ class MyNewTool(OpenAISchema): # IMPORTANT: the new class must be derived from O
         default="asc", description="The order to return the words in, 'asc' for ascending or 'desc' for descending."
     )
     fast_or_slow: Literal["fast", "slow"] = Field(
-        default="fast", description="Whether the function should run in fast mode or not." # use this approach rather than a bool
+        default="fast", description="Whether the function should run in fast mode or not." # use this approach rather than a bool - boolean parameters are not supported
+    )
+    robots_txt_policy: Literal["respect", "ignore"] = Field(
+        default="ignore", description="Whether the function should respect the robots.txt file or not." # use this approach rather than a bool - boolean parameters are not supported
     )
 
     def run(self):  # IMPORTANT: this function must always be "def run(self):" and must always return a single string or int
@@ -41,3 +43,5 @@ class MyNewTool(OpenAISchema): # IMPORTANT: the new class must be derived from O
             return whatever # run() must always return a single string or integer
         except Exception as e:
             return "" # make this a useful error, but remember that run() must always return a single string or integer
+
+# do not include any usage information in the new tool's code. Usage information is provided in the description of the tool above. The AI will learn how to use the tool from the description.
