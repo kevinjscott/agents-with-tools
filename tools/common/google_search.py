@@ -4,6 +4,7 @@ from pydantic import Field
 import json
 import os
 from serpapi import GoogleSearch as serpapi
+from dotenv import load_dotenv
 
 class GoogleSearch(OpenAISchema):
     """
@@ -23,6 +24,7 @@ class GoogleSearch(OpenAISchema):
 
     def run(self):
         try:
+            load_dotenv()
             api_key = os.getenv('SERPAPI_API_KEY')
             if not api_key:
                 raise ValueError("SERPAPI_API_KEY environment variable not set")

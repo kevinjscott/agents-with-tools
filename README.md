@@ -1,34 +1,37 @@
 # An Agent That Makes Its Own Tools
 
-This project is a Python-based application that leverages OpenAI's GPT-4 model to create and utilize Python tools. It uses Flask and Flask-SocketIO for the web server and real-time communication, respectively. The application is designed to interact with the OpenAI API, execute shell commands, and create new Python tools based on user input.
+## Summary
 
-# Getting Started
+This project uses an OpenAI Assistants API "tool" (was Function Calling) to create new tools and install/register them with the original agent that initiated the tool creation. That tool is tools/common/create_tool.py.
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+Each new tool is just a Python file that follows a specific format defined / described by tools/.example/example.py. The agent suggests the basic code and then the tool uses OpenAI to conform it to the necessary format.
 
-# Prerequisites
-
-- Python 3.7 or higher
-- pip (Python package installer)
-- Virtual environment (venv)
-
-# Setting Up Your Environment
+## Setting Up Your Environment
 
 1. Clone the repository to your local machine.
 
 2. Create a virtual environment in the project directory:
-```python3 -m venv venv```
+
+```bash
+python3 -m venv venv
+```
 
 3. Activate the virtual environment:
 
 - On macOS and Linux:
-```source venv/bin/activate```
+
+```bash
+source venv/bin/activate
+```
 
 4. Install the required Python packages:
-```pip install --upgrade pip```
-```pip install -r requirements.txt```
 
-# Environment Variables
+```bash
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+## Environment Variables
 
 This project requires the following environment variables:
 
@@ -37,15 +40,44 @@ This project requires the following environment variables:
 - SERPAPI_API_KEY: Your SerpAPI key for Google Search tool.
 
 You can set these environment variables in your shell:
-```export ASSISTANT1=your-assistant-id```
-```export OPENAI_API_KEY=your-openai-api-key```
-```export SERPAPI_API_KEY=your-serpapi-api-key```
+
+```bash
+export ASSISTANT1=your-assistant-id
+export OPENAI_API_KEY=your-openai-api-key
+export SERPAPI_API_KEY=your-serpapi-api-key
+```
 
 Or, you can use a .env file in the project root directory and load it with python-dotenv.
 
-# Running the Application
+## Running the Application
 
 To run the application, execute the following command:
-```python main.py```
 
-The application will start a Flask server on localhost:3000. You can interact with the application by opening a web browser and navigating to http://localhost:3000. The application provides a user-friendly interface for creating and utilizing Python tools. Enjoy exploring the capabilities of this application!
+```bash
+python main.py
+```
+
+Interact with the application at http://localhost:3000. Experiment with queries such as these:
+
+```
+What tools do you have access to?
+
+create a very simple tool that uses pandas to sort data by any column. don't do any file i/o...only use strings in/out.
+
+do a quick test of the pandas data sorter
+
+Describe all the tools that you would need to create in order to create and manage your own Instagram account from scratch.
+```
+
+## Inspiration
+- https://twitter.com/yoheinakajima/status/1730754111422034218
+- https://github.com/VRSEN/agency-swarm
+- https://github.com/jxnl/instructor
+
+## Known issues and future exploration
+
+GPT-4 tries to call functions with true/false when we need True/False. Seems like exactly what Pydantic should solve for us.
+
+Needs to be better at writing code, testing it, iterating, etc.
+
+Combine with other agents to create tools in parallel, plan out which tools are needed, keep things on the rails, ensure quality, etc.

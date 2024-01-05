@@ -1,12 +1,13 @@
-# agent_tool_maker.py
 from assistant_utils import get_completion, load_tools
 from openai import Client
 import os
+from dotenv import load_dotenv
 
 class AgentToolMaker:
     def __init__(self):
         self.client = Client()
         self.thread = self.client.beta.threads.create()
+        load_dotenv()
         self.assistant_id = os.getenv('ASSISTANT1')
         self.assistant = self.client.beta.assistants.update(
             self.assistant_id,

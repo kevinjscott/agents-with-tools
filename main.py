@@ -28,7 +28,8 @@ def execute_and_emit(input):
 
 @socketio.on('start')
 def handle_start():
-    execute_and_emit("Which tools do you have access to? Keep it brief.")
+    execute_and_emit("howdy")
+    # execute_and_emit("Which tools do you have access to? Keep it brief.")
     # execute_and_emit("create a very simple tool that uses pandas to sort data by any column. don't do any file i/o...only use strings in/out.")
     # execute_and_emit("do a quick test of the pandas data sorter")
 
