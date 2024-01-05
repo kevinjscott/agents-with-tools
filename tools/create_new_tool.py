@@ -3,7 +3,7 @@ from instructor import OpenAISchema
 from pydantic import Field
 import os
 from openai import OpenAI
-from assistant_utils import load_functions_and_tools
+from assistant_utils import load_tools
 
 class CreateNewTool(OpenAISchema):
     """
@@ -46,7 +46,7 @@ class CreateNewTool(OpenAISchema):
             prompt += "<<<<<--" + self.implementation_code + "-->>>>>\n"
             prompt += "<<<<<---" + str(self.required_modules) + "--->>>>>\n"
 
-            with open('functions/.example.py', 'r') as file:
+            with open('tools/.example.py', 'r') as file:
                 example_code = file.read()
             prompt += "<<<<<=" + example_code + "=>>>>>\n"
 
@@ -72,13 +72,13 @@ You write fully functional python code tools without todo's or incomplete soluti
             if start_index != -1 and end_index != -1:
                 new_tool_content = new_tool_content[start_index + len('```python'):end_index].strip()
 
-            directory = f'functions/{self.assistant_id}'
+            directory = f'tools/{self.assistant_id}'
             if not os.path.exists(directory):
                 os.makedirs(directory)
             with open(f'{directory}/{self.file_name}', 'w') as file:
                 file.write(new_tool_content)
 
-            load_functions_and_tools(self.assistant_id)
+            load_tools(self.assistant_id)
 
             return new_tool_content
 

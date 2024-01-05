@@ -19,16 +19,20 @@ def index():
 def handle_connect():
     emit('new_info', {'type': "reset"})
 
+def execute_and_emit(input):
+    emit('new_info', {'type': "status_running"})
+    result = agent_tool_maker.execute(input)
+    emit('new_info', {'type': "agent", 'text': "🤖 " + str(result)})
+    print("🤖 " + str(result))
+    emit('new_info', {'type': "status_stopped"})
+
 @socketio.on('start')
 def handle_start():
-    emit('new_info', {'type': "status_running"})
-    result = agent_tool_maker.execute("howdy")
-    while True:
-        emit('new_info', {'type': "agent", 'text': "🤖 " + str(result)})
-        print("🤖 " + str(result))
-        emit('new_info', {'type': "status_stopped"})
-        next_instruction = input("Enter your response: ")
-        result = agent_tool_maker.execute(next_instruction)
+    execute_and_emit("Which tools do you have access to?")
+
+@socketio.on('user_input')
+def handle_user_input(data):
+    execute_and_emit(data['input'])
 
 if __name__ == "__main__":
     socketio.run(app, host='localhost', port=3000)

@@ -10,7 +10,7 @@ import re
 import builtins
 import textwrap
 from flask_socketio import emit
-
+import sys
 
 client = OpenAI()
 
@@ -168,7 +168,8 @@ def get_completion(message, agent, funcs, thread):
             tool_outputs=tool_outputs
         )
       elif run.status == "failed":
-        raise Exception("Run Failed. Error: ", run.last_error)
+        # raise Exception("Run Failed. Error: ", run.last_error)
+        return ("Run Failed. Error: ", run.last_error, "\n\nWould you like me to retry?")
       else:
         messages = client.beta.threads.messages.list(
           thread_id=thread.id
@@ -176,19 +177,24 @@ def get_completion(message, agent, funcs, thread):
         message = messages.data[0].content[0].text.value
         return message
       
-def load_functions_and_tools(assistant_id):
+def load_tools(assistant_id):
     code_assistant_funcs = []
-    files_in_functions = glob.glob("functions/[!\\.]*.py")
-    files_in_subdirectories = glob.glob("functions/*/[!\\.]*.py")
+    files_in_functions = glob.glob("tools/[!\\.]*.py")
+    files_in_subdirectories = glob.glob("tools/*/[!\\.]*.py")
 
     requirements = set()
+    existing_requirements = set()
     # Load existing requirements
     if os.path.exists('requirements.txt'):
         with open('requirements.txt', 'r') as f:
             for line in f:
+                existing_requirements.add(line.strip())
+    if os.path.exists('requirements_for_tools.txt'):
+        with open('requirements_for_tools.txt', 'r') as f:
+            for line in f:
                 requirements.add(line.strip())
     for file in files_in_functions + files_in_subdirectories:
-        # Check for any missing imports and add them to requirements.txt
+        # Check for any missing imports and add them to requirements_for_tools.txt
         with open(file, 'r') as f:
             file_content = f.read()
             required_modules = []
@@ -198,7 +204,9 @@ def load_functions_and_tools(assistant_id):
                     required_modules_str = required_modules_match.group(1)
                     required_modules = [module.strip().strip("'\"") for module in required_modules_str.split(',')]
             for module in required_modules:
-                requirements.add(module)
+                # Only add the module to requirements if it's not part of the Python Standard Library and not in existing requirements
+                if module not in sys.builtin_module_names and module not in existing_requirements:
+                    requirements.add(module)
         spec = importlib.util.spec_from_file_location("module.name", file)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
@@ -209,11 +217,11 @@ def load_functions_and_tools(assistant_id):
 
         tools_array = [{"type": "function", "function": func.openai_schema} for func in code_assistant_funcs]
 
-    with open('requirements.txt', 'w') as f:
+    with open('requirements_for_tools.txt', 'w') as f:
         for requirement in sorted(requirements):
             f.write(requirement + '\n')
 
-    os.system('pip install -r requirements.txt > /dev/null')
+    os.system('pip install -r requirements_for_tools.txt')
 
     assistant = client.beta.assistants.update(
         assistant_id,

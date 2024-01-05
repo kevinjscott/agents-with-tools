@@ -4,15 +4,15 @@ from pydantic import Field
 
 class RetrieveToolFileContents(OpenAISchema):
     """
-    This tool searches for and retrieves the contents of a Python file with a given name within the 'functions' directory or a first-level subdirectory inside the 'functions' directory.
+    This tool searches for and retrieves the contents of a Python file with a given name within the 'tools' directory or a first-level subdirectory inside the 'tools' directory.
     
-    The tool expects the name of the file to follow the snake_case naming convention i.e. by converting the tool name from TitleCase to snake_case. If the file is not found in the 'functions' directory, a search is done within the first-level subdirectories. 
+    The tool expects the name of the file to follow the snake_case naming convention i.e. by converting the tool name from TitleCase to snake_case. If the file is not found in the 'tools' directory, a search is done within the first-level subdirectories. 
     
     IMPORTANT: Do not specify an assistant_id parameter.
 
     Pros:
     - It automates the process of file content retrieval for Python files based on naming conventions.
-    - It handles the search within both the main directory and nested subdirectories.
+    - It handles the search within both the main directory and nested subdirectories (the special location where Tools are stored)
     
     Cons:
     - It is limited to searching within a predefined directory structure and naming convention.
@@ -34,14 +34,14 @@ class RetrieveToolFileContents(OpenAISchema):
         import os
         import glob
 
-        # Start by searching in the 'functions' directory
-        file_path = f'functions/{self.filename}'
+        # Start by searching in the 'tools' directory
+        file_path = f'tools/{self.filename}'
         if not os.path.isfile(file_path):
-            # If not in 'functions', search in first-level subdirectories
-            found_files = glob.glob(f'functions/*/{self.filename}')
+            # If not in 'tools', search in first-level subdirectories
+            found_files = glob.glob(f'tools/*/{self.filename}')
             if not found_files:
                 # If no file is found, explain why
-                return f'No file found for {self.filename} in functions or its subdirectories.'
+                return f'No file found for {self.filename} in tools or its subdirectories.'
             file_path = found_files[0]
         
         # Read and return the file contents

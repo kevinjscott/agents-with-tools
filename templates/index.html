@@ -62,6 +62,16 @@
             cursor: pointer; 
             white-space: pre-wrap;
         }
+        #inputField {
+            display: none;
+            width: 100%;
+            height: 50px;
+            font-size: 1.0rem;
+            background-color: black;
+            color: white;
+            border: none;
+            padding: 10px;
+        }
     </style>
 
     <div id="buttonHolder" style="display: flex; justify-content: center; align-items: center; height: 100vh;">
@@ -69,6 +79,7 @@
     </div>
     <div id="info" class="p-5"></div>
     <div id="spinner"><div class="lds-grid" id="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div>
+    <input id="inputField" type="text" placeholder="Enter your response here...">
     <script>
         var socket = io();
         socket.on('new_info', function(data) {
@@ -77,11 +88,15 @@
                 infoDiv.innerHTML = '';
                 document.getElementById('buttonHolder').style.display = 'flex';
                 document.getElementById('spinner').style.display = 'none';
+                document.getElementById('inputField').style.display = 'none';
                 return;
               } else if (data.type === "status_running") {
                 document.getElementById('spinner').style.display = 'flex';
+                document.getElementById('inputField').style.display = 'none';
             } else if (data.type === "status_stopped") {
                 document.getElementById('spinner').style.display = 'none';
+                document.getElementById('inputField').style.display = 'block';
+                document.getElementById('inputField').value = '';
             } else {
                 var newP = document.createElement('p');
                 newP.textContent = data.text;
@@ -103,6 +118,21 @@
         document.getElementById('startButton').addEventListener('click', function() {
             this.parentElement.style.display = 'none';
             socket.emit('start');
+        });
+
+        var inputField = document.getElementById('inputField');
+
+        inputField.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                socket.emit('user_input', {input: this.value});
+                this.value = '';
+            }
+        });
+
+        document.body.addEventListener('keypress', function (e) {
+            if (e.target !== inputField) {
+                inputField.focus();
+            }
         });
     </script>
 </body>
