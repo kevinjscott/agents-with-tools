@@ -1,5 +1,7 @@
 # An Agent That Makes Its Own Tools
 
+This is just a prototype I made to show a concept. It's not a real project.
+
 ## Summary
 
 This project uses an OpenAI Assistants API "tool" (was Function Calling) to create new tools and install/register them with the original agent that initiated the tool creation. That tool is tools/common/create_tool.py.
@@ -73,6 +75,7 @@ Describe all the tools that you would need to create in order to create and mana
 - https://twitter.com/yoheinakajima/status/1730754111422034218
 - https://github.com/VRSEN/agency-swarm
 - https://github.com/jxnl/instructor
+- https://cursor.sh/
 
 ## Known issues and future exploration
 
