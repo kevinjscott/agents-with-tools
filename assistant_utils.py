@@ -158,7 +158,8 @@ def get_completion(message, agent, funcs, thread):
             for key in func.model_fields_set:
                 if key != "chain_of_thought":
                     print(f'\033[31m🛠️ {key}: {getattr(func, key)}', '\033[0m') # red
-                    emit('new_info', {'type': "tool_call", 'text': f'{key}:\n{getattr(func, key)}' if '\n' in getattr(func, key) else f'{key}: {getattr(func, key)}'})
+                    value = getattr(func, key)
+                    emit('new_info', {'type': "tool_call", 'text': f'{key}:\n{value}' if isinstance(value, str) and '\n' in value else f'{key}: {value}'})
             output = str(func.run())
         except Exception as e:
             output = "Error: " + str(e)
@@ -194,8 +195,7 @@ def get_completion(message, agent, funcs, thread):
       
 def load_tools(assistant_id):
     code_assistant_funcs = []
-    files_in_functions = glob.glob("tools/[!\\.]*.py")
-    files_in_subdirectories = glob.glob("tools/*/[!\\.]*.py")
+    tool_files = glob.glob("tools/*/[!\\.]*.py")
 
     requirements = set()
     existing_requirements = set()
@@ -208,7 +208,7 @@ def load_tools(assistant_id):
         with open('requirements_for_tools.txt', 'r') as f:
             for line in f:
                 requirements.add(line.strip())
-    for file in files_in_functions + files_in_subdirectories:
+    for file in tool_files:
         # Check for any missing imports and add them to requirements_for_tools.txt
         with open(file, 'r') as f:
             file_content = f.read()

@@ -16,12 +16,19 @@
             color: white; 
             font-size: 1.0rem;
             display: -webkit-box;
-            -webkit-line-clamp: 2;
+            -webkit-line-clamp: 4;
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
+            padding-bottom: 1rem;
         }
-        .info-text.agent { color: white; }
+        .info-text.agent {
+            color: white;
+            overflow: unset;
+            text-overflow: unset;
+            display: block;
+            white-space: pre-wrap;
+        }
         .info-text.tool_call { 
             color: rgb(177, 177, 177);
             background-color: #118;
@@ -40,7 +47,7 @@
         }
         .info-text.collapsed { 
             display: -webkit-box;
-            -webkit-line-clamp: 2;
+            -webkit-line-clamp: 4;
             -webkit-box-orient: vertical;  
             text-wrap: wrap; 
             cursor: pointer; 
@@ -78,7 +85,11 @@
       <button id="startButton" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Start</button>
     </div>
     <div id="info" class="p-5"></div>
-    <div id="spinner"><div class="lds-grid" id="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div>
+    <div id="spinner">
+        <div class="lds-grid" id="lds-grid">
+            <div></div><div></div><div></div>
+        </div>
+    </div>
     <input id="inputField" type="text" placeholder="Enter your response here...">
     <script>
         var socket = io();
@@ -102,7 +113,7 @@
                 newP.textContent = data.text;
                 newP.className = "info-text " + data.type;
                 infoDiv.appendChild(newP);
-                if (data.text.split('\n').length > 1 || newP.scrollHeight > newP.clientHeight) {
+                if ((data.type === "tool_call" || data.type === "tool_result") && (data.text.split('\n').length > 1 || newP.scrollHeight > newP.clientHeight)) {
                     newP.className += " collapsed";
                     newP.onclick = function() {
                         if (this.className.includes("collapsed")) {

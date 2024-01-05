@@ -34,14 +34,14 @@ class RetrieveToolFileContents(OpenAISchema):
         import os
         import glob
 
-        # Start by searching in the 'tools' directory
-        file_path = f'tools/{self.filename}'
+        # Start by searching in the 'tools/common' directory
+        file_path = f'tools/common/{self.filename}'
         if not os.path.isfile(file_path):
-            # If not in 'tools', search in first-level subdirectories
-            found_files = glob.glob(f'tools/*/{self.filename}')
+            # If not in 'tools/common', search in first-level subdirectories
+            found_files = glob.glob(f'tools/*/common/{self.filename}')
             if not found_files:
                 # If no file is found, explain why
-                return f'No file found for {self.filename} in tools or its subdirectories.'
+                return f'No file found for {self.filename} in tools/common or its subdirectories.'
             file_path = found_files[0]
         
         # Read and return the file contents
