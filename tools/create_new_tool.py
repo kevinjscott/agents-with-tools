@@ -9,7 +9,7 @@ class CreateNewTool(OpenAISchema):
     """
     This tool is designed to automate the creation of new Python tools. Tools are Python files that can be used by the LLM in the future. They have a special format (e.g. specific methods, imports, and comment styles) so tools are created using a pre-existing tool template that addresses this.
     
-    This tool reads the contents of a predefined example Python file template '.example.py' to use as a style guide. It then generates a new tool (a Python file) that implements the desired functionality while adhering to the style of the example file. Then it saves the new tool to disk for future use.
+    This tool reads the contents of a predefined example Python file template '.example/example.py' to use as a style guide. It then generates a new tool (a Python file) that implements the desired functionality while adhering to the style of the example file. Then it saves the new tool to disk for future use.
 
     In the process of modifying your code, this tool will try to fix bugs, so the created tool may actually function differently from what you originally wrote. This is a good thing because it means the tool will be more robust and less likely to break in the future.
 
@@ -36,7 +36,7 @@ class CreateNewTool(OpenAISchema):
     class_name: str = Field(..., description="The TitleCase name of the new tool's class. This must always use exactly the same words as file_name, but be written in TitleCase.")
     file_name: str = Field(..., description="The snake_case name of the python file to save, with extension. This must always use exactly the same words as class_name, but be written in snake_case.")
     description: str = Field(..., description="A highly detailed description of the new tool's functionality. Before writing this, you should consider which architecture and design patterns to use as well as research the best libraries to use.")
-    implementation_code: str = Field(..., description="The fully functional python code that will be sent to openai along with the .example.py file. Note that this code will be modified / reformatted by the LLM. Bugs will be fixed and improvements will be made.")
+    implementation_code: str = Field(..., description="The fully functional python code that will be sent to openai along with the .example/example.py file. Note that this code will be modified / reformatted by the LLM. Bugs will be fixed and improvements will be made.")
     implementation_code_modules: str = Field(..., description="The names of the pip-installable modules needed to run your implementation_code. All modules will be incorporated into the new tool's Python code.")
 
     def run(self):
@@ -46,7 +46,7 @@ class CreateNewTool(OpenAISchema):
             prompt += "<<<<<--" + self.implementation_code + "-->>>>>\n"
             prompt += "<<<<<---" + str(self.required_modules) + "--->>>>>\n"
 
-            with open('tools/.example.py', 'r') as file:
+            with open('tools/.example/example.py', 'r') as file:
                 example_code = file.read()
             prompt += "<<<<<=" + example_code + "=>>>>>\n"
 

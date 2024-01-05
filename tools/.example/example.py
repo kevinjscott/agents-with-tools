@@ -1,5 +1,5 @@
-from typing import ClassVar, List, Literal # IMPORTANT: ClassVar, List, and Literal are always required, so always include this line!
-from instructor import OpenAISchema # IMPORTANT: OpenAISchema is always required! Note how the MyNewTool class is derived from OpenAISchema, not BaseModel
+from typing import ClassVar, List, Literal # IMPORTANT: ClassVar, List, and Literal are always required, so always include this line! Note how these three are used in the example below.
+from instructor import OpenAISchema # IMPORTANT: OpenAISchema is always required from instructor! Note how the MyNewTool class is derived from OpenAISchema, not BaseModel
 from pydantic import Field # IMPORTANT: Field is always required
 from bs4 import BeautifulSoup # this import is just an example that has a non-trivial pip-installable module dependency
 
@@ -15,6 +15,9 @@ class MyNewTool(OpenAISchema): # IMPORTANT: the new class must be derived from O
     
     [Instructions for when to use an alternative tool]
     """
+
+    # Below are all the params that can be passed in. IMPORTANT: you might think bool would work...and it should...but it doesn't. So use Literal instead. It's easy and works just as well. There's even an example below.
+
     required_modules: ClassVar[List[str]] = ['nest_asyncio', 'requests_html', 'markdownify'] # array of pip-installable package names that are needed to support the imports of this file (these are just examples). Put everything on a single line.
     # IMPORTANT: required_modules is always required and must always be a ClassVar. If there are no required modules, then use:
     # required_modules: ClassVar[List[str]] = []

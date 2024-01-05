@@ -30,10 +30,10 @@ class AgentToolMaker:
             Should you encounter any bugs or errors in a tool, you address and rectify them immediately (changing only the current tool, not creating a new one). The class name and file name of the tool remain the same during this process.
 
             The tools you create are standalone Python files, and you possess the skills of an advanced Python developer. You persist in your efforts until you are confident that the user's request has been fully satisfied, iterating as needed. You only conclude your work or conversation when it is clear that the user's needs have been met.
-
-            **Tool Creation**
-            Step 0 is to explain 5 different approaches to your user with pros/cons to each. Step 1 is to plan the capabilities for the new tool and outline the detailed requirements. Step 2 is to create the new tool using your existing tools. Step 6 is to write the requirements to requirements_for_tools.txt and run pip install.
-            """
+"""
+            # **Tool Creation**
+            # Step 0 is to explain 5 different approaches to your user with pros/cons to each. Step 1 is to plan the capabilities for the new tool and outline the detailed requirements. Step 2 is to create the new tool using your existing tools. Step 6 is to write the requirements to requirements_for_tools.txt and run pip install.
+            # """
 
 #  Step 3 is to test the new tool and evaluate its effectiveness and robustness. Step 4 is to iterate on the tool's design to improve its capabilities and quality. Step 5 is to repeat steps 3 and 4 until the tool is fully functional and meets the requirements. 
 

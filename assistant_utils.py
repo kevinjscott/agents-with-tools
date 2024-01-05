@@ -126,17 +126,22 @@ def get_completion(message, agent, funcs, thread):
                 run_id=run.id
             )
 
-        # Run the function with a watchdog timer of 5 seconds
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            future = executor.submit(retrieve_run)
-            try:
-                run = future.result(timeout=5)
-            except concurrent.futures.TimeoutError:
-                print("Run retrieval took longer than 5 seconds. Moving on.")
-                return
-            except Exception as e:
-                print(f"Error occurred: {str(e)}")
-                return
+        retry_count = 0
+        while retry_count < 5:
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                future = executor.submit(retrieve_run)
+                try:
+                    run = future.result(timeout=20)
+                    break
+                except concurrent.futures.TimeoutError:
+                    print("Run retrieval took longer than 20 seconds. Retrying...")
+                    retry_count += 1
+                except Exception as e:
+                    print(f"Error occurred: {str(e)}. Retrying...")
+                    retry_count += 1
+        if retry_count == 5:
+            print("Run retrieval failed after 5 attempts. Moving on.")
+            return
 
       if run.status == "requires_action":
         tool_calls = run.required_action.submit_tool_outputs.tool_calls
@@ -162,11 +167,21 @@ def get_completion(message, agent, funcs, thread):
         emit('new_info', {'type': "tool_result", 'text': "⬅️🛠️ " + tool_call.function.name + "...\n" + output + "\n"})
         tool_outputs.append({"tool_call_id": tool_call.id, "output": output})
 
-        run = client.beta.threads.runs.submit_tool_outputs(
-            thread_id=thread.id,
-            run_id=run.id,
-            tool_outputs=tool_outputs
-        )
+        retry_count = 0
+        while retry_count < 5:
+            try:
+                run = client.beta.threads.runs.submit_tool_outputs(
+                    thread_id=thread.id,
+                    run_id=run.id,
+                    tool_outputs=tool_outputs
+                )
+                break
+            except Exception as e:
+                print(f"Submission of tool outputs encountered an error: {str(e)}. Retrying...")
+                retry_count += 1
+        if retry_count == 5:
+            print("Submission of tool outputs failed after 5 attempts. Moving on.")
+            return
       elif run.status == "failed":
         # raise Exception("Run Failed. Error: ", run.last_error)
         return ("Run Failed. Error: ", run.last_error, "\n\nWould you like me to retry?")
@@ -219,7 +234,8 @@ def load_tools(assistant_id):
 
     with open('requirements_for_tools.txt', 'w') as f:
         for requirement in sorted(requirements):
-            f.write(requirement + '\n')
+            if requirement:  # Ignore empty strings
+                f.write(requirement + '\n')
 
     os.system('pip install -r requirements_for_tools.txt')
 
