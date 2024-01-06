@@ -10,8 +10,6 @@ app = Flask(__name__)
 socketio = SocketIO(app)
 agent_tool_maker = AgentToolMaker()
 
-code_run = False
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -29,12 +27,12 @@ def execute_and_emit(input):
 
 @socketio.on('start')
 def handle_start():
-    # execute_and_emit("howdy")
+    execute_and_emit("howdy")
     # execute_and_emit("Which tools do you have access to? Keep it brief.")
     # execute_and_emit("create a very simple tool that uses pandas to sort data by any column.") 
     # don't do any file i/o...only use strings in/out.")
     # execute_and_emit("do a quick test of the pandas data sorter")
-    execute_and_emit("Let's get started with the encryption tool. Generate the key pair using the default key size, and then use the generated public key to encrypt a test message (\"Yo - wassup?\" and password \"password\"). After the keys are generated, perform the 'encrypt' operation with the sample message.")
+    # execute_and_emit("Let's get started with the encryption tool. Generate the key pair using the default key size, and then use the generated public key to encrypt a test message (\"Yo - wassup?\" and password \"password\"). After the keys are generated, perform the 'encrypt' operation with the sample message.")
 
 @socketio.on('user_input')
 def handle_user_input(data):

@@ -79,7 +79,7 @@ Describe all the tools that you would need to create in order to create and mana
 
 ## Known issues and future exploration
 
-GPT-4 tries to call functions with true/false when we need True/False. Seems like exactly what Pydantic should solve for us.
+GPT-4 tries to call functions with true / false when we need True / False or "true" / "false". Seems like exactly what Pydantic should solve for us. Pydantic rejects true, but not True or "true" or "True". https://docs.pydantic.dev/1.10/usage/types/#booleans
 
 Needs to be better at writing code, testing it, iterating, etc.
 
