@@ -7,3 +7,4 @@ __pycache__/
 __pycache__
 tools/asst_*
 sandbox
+requirements_for_tools.txt
