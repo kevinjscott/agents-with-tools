@@ -1,7 +1,10 @@
 from typing import ClassVar, List, Literal # IMPORTANT: ClassVar, List, and Literal are always required, so always include this line! Note how these three are used in the example below.
 from instructor import OpenAISchema # IMPORTANT: OpenAISchema is always required from instructor! Note how the MyNewTool class is derived from OpenAISchema, not BaseModel
 from pydantic import Field # IMPORTANT: Field is always required
+import traceback # IMPORTANT: this import is always required
+
 from bs4 import BeautifulSoup # this import is just an example that has a non-trivial pip-installable module dependency
+
 
 class MyNewTool(OpenAISchema): # IMPORTANT: the new class must be derived from OpenAISchema, not BaseModel. Don't you dare use BaseModel!
     """
@@ -45,6 +48,7 @@ class MyNewTool(OpenAISchema): # IMPORTANT: the new class must be derived from O
             # don't take any shortcuts: write ALL of the code with no "todo" items or "the rest of the code goes here" partial work
             return whatever # run() must always return a single string or integer
         except Exception as e:
-            return "" # make this a useful error, but remember that run() must always return a single string or integer
+            return f"Encountered an error when executing the tool_call: {traceback.format_exc()}. Please fix the error and try again." # make this a useful error, but remember that run() must always return a single string or integer
 
 # Note: do not include any additional usage information in the new tool's code because this tool's usage information is given in the description of the tool above. The AI agent using the new tool will learn how to use the tool from that description.
+

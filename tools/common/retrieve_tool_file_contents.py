@@ -38,7 +38,7 @@ class RetrieveToolFileContents(OpenAISchema):
         file_path = f'tools/common/{self.filename}'
         if not os.path.isfile(file_path):
             # If not in 'tools/common', search in first-level subdirectories
-            found_files = glob.glob(f'tools/*/common/{self.filename}')
+            found_files = glob.glob(f'tools/*/{self.filename}')
             if not found_files:
                 # If no file is found, explain why
                 return f'No file found for {self.filename} in tools/common or its subdirectories.'

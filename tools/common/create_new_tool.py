@@ -4,6 +4,7 @@ from pydantic import Field
 import os
 from openai import OpenAI
 from assistant_utils import load_tools
+import traceback
 
 class CreateNewTool(OpenAISchema):
     """
@@ -78,9 +79,11 @@ You write fully functional python code tools without todo's or incomplete soluti
             with open(f'{directory}/{self.file_name}', 'w') as file:
                 file.write(new_tool_content)
 
+            result = f"Created {self.file_name}\n\n{new_tool_content}"
+
             load_tools(self.assistant_id)
-
-            return new_tool_content
-
         except Exception as e:
-            return str(e)
+            result += f"\n===========\nAn error occurred while loading the new tool: \n\n{traceback.format_exc()}"
+        finally:
+            return result
+

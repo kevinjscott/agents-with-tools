@@ -1,8 +1,14 @@
-from assistant_utils import get_completion, load_tools
+from assistant_utils import get_completion, load_tools, ToolsLoadingException
 from openai import Client
 import os
 from dotenv import load_dotenv
+import traceback
 
+# class ToolsLoadingException(Exception):
+#     def __init__(self, message, code_assistant_funcs, tools_array):
+#         super().__init__(message)
+#         self.code_assistant_funcs = code_assistant_funcs
+#         self.tools_array = tools_array
 class AgentToolMaker:
     def __init__(self):
         self.client = Client()
@@ -31,15 +37,26 @@ class AgentToolMaker:
             Should you encounter any bugs or errors in a tool, you address and rectify them immediately (changing only the current tool, not creating a new one). The class name and file name of the tool remain the same during this process.
 
             The tools you create are standalone Python files, and you possess the skills of an advanced Python developer. You persist in your efforts until you are confident that the user's request has been fully satisfied, iterating as needed. You only conclude your work or conversation when it is clear that the user's needs have been met.
-"""
-            # **Tool Creation**
-            # Step 0 is to explain 5 different approaches to your user with pros/cons to each. Step 1 is to plan the capabilities for the new tool and outline the detailed requirements. Step 2 is to create the new tool using your existing tools. Step 6 is to write the requirements to requirements_for_tools.txt and run pip install.
-            # """
 
-#  Step 3 is to test the new tool and evaluate its effectiveness and robustness. Step 4 is to iterate on the tool's design to improve its capabilities and quality. Step 5 is to repeat steps 3 and 4 until the tool is fully functional and meets the requirements. 
+            The common connection between all of your tools is that they exchange data as strings. It's possible that there may be exceptions to this, but by default, all tools should exchange data as strings. This is important because it allows you to chain tools together in a sequence. For example, you could use the "GoogleSearch" tool to search for a website and then use the "RetrieveToolFileContents" tool to scrape the website's contents. This is a powerful capability that you should typically insist on when creating new tools.
 
+            If you create a tool that requires something to be installed, just go ahead and do it...don't ask for permission. Don't assume that if you fix one issue, the whole tool is good to go. You should always test the tool to ensure it works as expected. If you find any issues, fix them and test again. Repeat this process until the tool is fully functional and meets the requirements. If you need to compare tools or understand their inner workings, you have the ability to read their source code.
+
+            **Tool Creation**
+            Step 0 is to explain 5 different approaches to your user with pros/cons to each. Step 1 is to plan the capabilities for the new tool and outline the detailed requirements. Step 2 is to create the new tool using your existing tools. Step 3 is to test the new tool and evaluate its effectiveness and robustness. Step 4 is to iterate on the tool's design to improve its capabilities and quality. Step 5 is to repeat steps 3 and 4 until the tool is fully functional and meets the requirements. Step 6 is to write the requirements to requirements_for_tools.txt and run pip install.
+            """
         )
 
     def execute(self, prompt):
-        self.code_assistant_funcs, self.tools_array, self.assistant = load_tools(self.assistant_id)
-        return get_completion(prompt, self.assistant, self.code_assistant_funcs, self.thread)
+        try:
+            os.system('pip install -r requirements_for_tools.txt')
+            os.system('pip install -r requirements.txt')
+            self.code_assistant_funcs, self.tools_array = load_tools(self.assistant_id)
+        except ToolsLoadingException as e:
+            self.code_assistant_funcs = e.code_assistant_funcs
+            self.tools_array = e.tools_array
+            completion = get_completion(f"One of your tools has an issue. Fix it. {traceback.format_exc()}", self.assistant, self.code_assistant_funcs, self.thread)
+            return completion
+
+        completion = get_completion(prompt, self.assistant, self.code_assistant_funcs, self.thread)
+        return completion

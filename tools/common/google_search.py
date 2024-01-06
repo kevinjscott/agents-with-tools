@@ -5,6 +5,7 @@ import json
 import os
 from serpapi import GoogleSearch as serpapi
 from dotenv import load_dotenv
+import traceback
 
 class GoogleSearch(OpenAISchema):
     """
@@ -38,4 +39,5 @@ class GoogleSearch(OpenAISchema):
             results = search.get_dict()
             return json.dumps(results.get("organic_results"))
         except Exception as e:
-            return json.dumps({"error": str(e)})
+            return f"An unexpected error occurred: {traceback.format_exc()}"
+

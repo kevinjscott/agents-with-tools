@@ -2,6 +2,7 @@ from instructor import OpenAISchema
 from typing import ClassVar, List
 from openai import OpenAI
 from pydantic import Field
+import traceback
 
 class AskAI(OpenAISchema):
     """
@@ -61,6 +62,5 @@ class AskAI(OpenAISchema):
             completion = response.choices[0].message.content
             return completion
         except Exception as e:
-            return f"Error: {str(e)}"
-        except:
-            return "An unexpected error occurred."
+            return f"An unexpected error occurred: {traceback.format_exc()}"
+
