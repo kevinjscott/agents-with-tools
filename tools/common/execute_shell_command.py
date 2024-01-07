@@ -15,7 +15,24 @@ class ExecuteShellCommand(OpenAISchema):
 
     IMPORTANT: if a command you run needs to write to a file, you must place it in the sandbox directory.
 
-    The tool works by using the subprocess module to run the specified shell command. The output and errors are captured and returned to the user.
+    The tool works by using the subprocess module to run the specified shell command. The output and errors are captured and returned to the user. Use this tool to get the current date / time or to connect to other servers via wget, curl, etc. Here are some examples of commands that are safe to run:
+    curl
+    date
+    cat
+    grep
+    awk
+    sed
+    wget
+    diff
+    patch
+    sort
+    ssh
+    gzip
+    gunzip
+    ls
+    pwd
+    echo
+
     
     Pros:
     - It allows for the execution of shell commands programmatically and can be useful for automation tasks.

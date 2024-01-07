@@ -39,7 +39,7 @@ This project requires the following environment variables:
 
 - ASSISTANT1: The ID of your OpenAI assistant.
 - OPENAI_API_KEY: Your OpenAI API key.
-- SERPAPI_API_KEY: Your SerpAPI key for Google Search tool.
+- SERPAPI_API_KEY: Your SerpAPI key for Google Search tool. (Optional - without this, the Google Search tool will not work.)
 
 You can set these environment variables in your shell:
 
